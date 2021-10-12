@@ -1,3 +1,11 @@
+# %% [markdown]
+# 진행절차는 다음과 같다.
+# 1. 기존 백테스트.py 생성하는 중간 파일과 최대한 같도록 pandas를 이용하여 코드를 자성한다.
+#    아래 코드는 수행후에 중간 생성 파일과 비교하여 같음을 확인했다.
+# 2. 새로 복제한 코드를 bt.algo 클래스로 재작성한다.
+#    이때도 우선 같은 결과를 도출하도록 작성한 후 일반적인 lookback 및
+#    lag를 도입하여 기존 결과와 비교분석하면서 개선한다.
+#
 # %%
 import numpy as np
 import pandas as pd
@@ -32,8 +40,8 @@ m12 = (prices.pct_change(365-30) + 1).shift(30)
 IDM = 평균수익률 * 이산성
 IDM
 # %%
-
-
+##################################################
+# 백테스팅을 위한 전략 클래스 작성
 class StatIDMomentumScore(bt.Algo):
     def __init__(self, lookback=pd.DateOffset(years=2), #FIXME : 12개월이되어야 하지만 원 알고리즘을 테스트한다.
                  lag=pd.DateOffset(months=1)):
