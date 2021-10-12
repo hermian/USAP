@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-import _bt
+import bt
 import seaborn as sns
 import matplotlib.pyplot as plt
 
