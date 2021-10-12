@@ -61,7 +61,7 @@ class StatIDMomentumScore(bt.Algo):
         # ID 계산 최근 30일 제외
         # dropna에 주의 해야 한다. 조선이 0이 있어 문제가 되므로 모든 column이 nan일 때만 drop한다.
         # print(prc[-(365+30):])
-        print(f"{t0} len {len(prc[-(366+30):].pct_change(30).dropna(how='all'))}")
+        #print(f"{t0} len {len(prc[-(366+30):].pct_change(30).dropna(how='all'))}")
         pos_percent = np.where(prc[-(366+30):].pct_change(30).dropna(how='all') > 0.0, 1, 0).mean(axis=0)
         neg_percent = 1 - pos_percent
         ID = (neg_percent - pos_percent)
@@ -69,22 +69,30 @@ class StatIDMomentumScore(bt.Algo):
 
         target.temp['stat'] = average_returns * ID * -1
         return True
-      
+ # %%     
+def bt_SectorIDMomentum(name, n, tickers, prices):
+    st = bt.Strategy(name,
+                      algos = [
+                          bt.algos.RunAfterDate('2002-1-2'),
+                          bt.algos.RunMonthly(),
+                          bt.algos.SelectAll(),
+                          bt.algos.SelectThese(tickers),
+                          StatIDMomentumScore(lag=pd.DateOffset(days=0)),
+                          bt.algos.SelectN(n=n, sort_descending=True),
+                          # bt.algos.PrintDate(),
+                          bt.algos.WeighEqually(),
+                          # bt.algos.PrintTempData(),
+                          bt.algos.Rebalance()
+                      ],
+                     )
+    return bt.Backtest(st, prices)
+# %%
 tickers = list(prices.columns[:-4])#+['현금']
-st1 = bt.Strategy("한국1ID상대모멘텀",
-                  algos = [
-                      bt.algos.RunAfterDate('2002-1-2'),
-                      bt.algos.RunMonthly(),
-                      bt.algos.SelectAll(),
-                      bt.algos.SelectThese(tickers),
-                      StatIDMomentumScore(lag=pd.DateOffset(days=0)),
-                      bt.algos.SelectN(n=1, sort_descending=True),
-                      # bt.algos.PrintDate(),
-                      bt.algos.WeighEqually(),
-                      bt.algos.PrintTempData(),
-                      bt.algos.Rebalance()
-                  ],
-                 )
-bt_s1 = bt.Backtest(st1, prices)
-r1 = bt.run(bt_s1)
-
+bt_id1 = bt_SectorIDMomentum("base1.ID상대모멘텀", n=1, tickers=tickers, prices=prices)
+bt_id2 = bt_SectorIDMomentum("base2.ID상대모멘텀", n=2, tickers=tickers, prices=prices)
+bt_id3 = bt_SectorIDMomentum("base3.ID상대모멘텀", n=3, tickers=tickers, prices=prices)
+# %%
+r = bt.run(bt_id1, bt_id2, bt_id3)
+# %%
+r.set_date_range("2002-02-01")
+r.display()
