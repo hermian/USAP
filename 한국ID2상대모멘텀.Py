@@ -1,9 +1,10 @@
 
 # %% [markdown] #
-# %% https://www.index.go.kr/potal/main/EachDtlPageDetail.do?idx_cd=1086
-# %% 주기를 월호 새서 다운로드한다. (2001년 1월~) # 보유금액 >
-# %% 유가증권시장 사용 # (1) 한달 lag(shift(1)) 한다.  # - 1월의
-# %% 데이터가 1월 마지막날 데이터이고 2월 1일 리밸런싱시에 사용하기
+# https://www.index.go.kr/potal/main/EachDtlPageDetail.do?idx_cd=1086
+# 주기를 월로 해서 다운로드한다. (2001년 1월~)
+# 보유금액 > 유가증권시장 사용
+#  (1) 한달 lag(shift(1)) 한다.
+#  - 1월의 데이터가 1월 마지막날 데이터이고 2월 1일 리밸런싱시에 사용하기
 # %% 위함
 외국인수급 = pd.read_csv('data/외국인수급.csv') 외국인수급 =
 외국인수급.set_index('Date').T 외국인수급.index =
