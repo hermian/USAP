@@ -15,44 +15,47 @@ kbase1 = bt.Strategy('kbase1',
                     )
 
 bt_kbase1 = bt.Backtest(kbase1,  prices)
-r = bt.run(bt_kbase1)                    
+r = bt.run(bt_kbase1)
 
 # ID2
 tickers = list(prices.columns[:-4])+['현금']
-kbase2 = bt.Strategy('kbase2',
-                    algos = [
-                        bt.algos.RunAfterDate('2002-1-2'),
-                        bt.algos.RunMonthly(),
-                        bt.algos.SelectAll(),
-                        bt.algos.SelectThese(tickers),
-                        StatIDAverageMomentumScore(lag=pd.DateOffset(days=0), cash='현금'),
-                        bt.algos.SelectN(n=2, sort_descending=True),
-                        # bt.algos.PrintDate(),
-                        WeighEquallyWithoutCash(target_weights, cash='현금'),
-                        # bt.algos.PrintTempData(),
-                        bt.algos.Rebalance()
-                    ]
-                    )
+kbase2 = bt.Strategy(
+    'kbase2',
+    [
+        bt.algos.RunAfterDate('2002-1-2'),
+        bt.algos.RunMonthly(),
+        bt.algos.SelectAll(),
+        bt.algos.SelectThese(tickers),
+        StatIDAverageMomentumScore(lag=pd.DateOffset(days=0), cash='현금'),
+        bt.algos.SelectN(n=2, sort_descending=True),
+        # bt.algos.PrintDate(),
+        WeighEquallyWithoutCash(target_weights, cash='현금'),
+        # bt.algos.PrintTempData(),
+        bt.algos.Rebalance()
+    ]
+)
 
 bt_kbase2 = bt.Backtest(kbase2,  prices)
 r = bt.run(bt_kbase2)
 
 # ID3
+
 tickers = list(prices.columns[:-4])+['현금']
-kbase3 = bt.Strategy('kbase3',
-                    algos = [
-                        bt.algos.RunAfterDate('2002-1-2'),
-                        bt.algos.RunMonthly(),
-                        bt.algos.SelectAll(),
-                        bt.algos.SelectThese(tickers),
-                        StatIDAverageMomentumScore(lag=pd.DateOffset(days=0), cash='현금'),
-                        bt.algos.SelectN(n=3, sort_descending=True),
-                        # bt.algos.PrintDate(),
-                        WeighEquallyWithoutCash(target_weights, cash='현금'),
-                        # bt.algos.PrintTempData(),
-                        bt.algos.Rebalance()
-                    ]
-                    )
+kbase3 = bt.Strategy(
+    'kbase3',
+     [
+        bt.algos.RunAfterDate('2002-1-2'),
+        bt.algos.RunMonthly(),
+        bt.algos.SelectAll(),
+        bt.algos.SelectThese(tickers),
+        StatIDAverageMomentumScore(lag=pd.DateOffset(days=0), cash='현금'),
+        bt.algos.SelectN(n=3, sort_descending=True),
+        # bt.algos.PrintDate(),
+        WeighEquallyWithoutCash(target_weights, cash='현금'),
+        # bt.algos.PrintTempData(),
+        bt.algos.Rebalance()
+    ]
+)
 
 bt_kbase3 = bt.Backtest(kbase3,  prices)
 r = bt.run(bt_kbase3)
@@ -68,21 +71,20 @@ target_weights1.columns = ['base1', '현금'] # 'base1'은 위의 전략과 이�
 
 
 kbase1 = bt.Strategy('kbase1',
-                    algos = [
-                        bt.algos.RunAfterDate('2002-1-2'),
-                        bt.algos.RunMonthly(),
-                        bt.algos.SelectAll(),
-                        bt.algos.SelectThese(tickers),
-                        StatIDAverageMomentumScore(lag=pd.DateOffset(days=0), cash='현금'),
-                        bt.algos.SelectN(n=1, sort_descending=True),
-                        # bt.algos.PrintDate(),
-                        WeighEquallyWithoutCash(target_weights1, cash='현금'),
-                        # bt.algos.PrintTempData(),
-                        bt.algos.Rebalance()
-                    ],
-                     children=tickers,
-                     # parent=kbase123
-                    )
+    [
+        bt.algos.RunAfterDate('2002-1-2'),
+        bt.algos.RunMonthly(),
+        bt.algos.SelectAll(),
+        bt.algos.SelectThese(tickers),
+        StatIDAverageMomentumScore(lag=pd.DateOffset(days=0), cash='현금'),
+        bt.algos.SelectN(n=1, sort_descending=True),
+        # bt.algos.PrintDate(),
+        WeighEquallyWithoutCash(target_weights1, cash='현금'),
+        # bt.algos.PrintTempData(),
+        bt.algos.Rebalance()
+    ],
+    children=tickers,
+)
 #--
 외국인수급 = pd.read_csv('data/외국인수급.csv')
 외국인수급 = 외국인수급.set_index('Date').T
@@ -99,29 +101,29 @@ kbase1 = bt.Strategy('kbase1',
 연속3개월 = ((외국인수급['3m'] > 0) & (외국인수급['2m'] > 0) & (외국인수급['1m'] > 0))
 연속2개월 = ((외국인수급['2m'] > 0) & (외국인수급['1m'] > 0))
 연속1개월 = (외국인수급['1m'] > 0)
-target_weights2 = pd.DataFrame(np.where(연속3개월, 1.0, 
-                                      np.where(연속2개월, 0.66, 
-                                               np.where(연속1개월, 0.33, 0))), 
+target_weights2 = pd.DataFrame(np.where(연속3개월, 1.0,
+                                        np.where(연속2개월, 0.66,
+                                                np.where(연속1개월, 0.33, 0))),
                              index=외국인수급.index, columns=['base2'])
 target_weights2['현금'] = 1.0 - target_weights2
 target_weights2.columns = ['base2', '현금']
 
-kbase2 = bt.Strategy('kbase2',
-                    algos = [
-                        bt.algos.RunAfterDate('2002-1-2'),
-                        bt.algos.RunMonthly(),
-                        bt.algos.SelectAll(),
-                        bt.algos.SelectThese(tickers),
-                        StatIDAverageMomentumScore(lag=pd.DateOffset(days=0), cash='현금'),
-                        bt.algos.SelectN(n=2, sort_descending=True),
-                        # bt.algos.PrintDate(),
-                        WeighEquallyWithoutCash(target_weights2, cash='현금'),
-                        # bt.algos.PrintTempData(),
-                        bt.algos.Rebalance()
-                    ],
-                    children=tickers,
-                    # parent=kbase123
-                    )
+kbase2 = bt.Strategy(
+    'kbase2',
+    [
+        bt.algos.RunAfterDate('2002-1-2'),
+        bt.algos.RunMonthly(),
+        bt.algos.SelectAll(),
+        bt.algos.SelectThese(tickers),
+        StatIDAverageMomentumScore(lag=pd.DateOffset(days=0), cash='현금'),
+        bt.algos.SelectN(n=2, sort_descending=True),
+        # bt.algos.PrintDate(),
+        WeighEquallyWithoutCash(target_weights2, cash='현금'),
+        # bt.algos.PrintTempData(),
+        bt.algos.Rebalance()
+    ],
+    children=tickers,
+)
 #--
 def AMS(x):
     ''' x : Series (DataFrame의 컬럼)
@@ -130,7 +132,7 @@ def AMS(x):
         => 오늘날짜/과거날짜 > 1 => 오늘날짜 > 과거날짜  => x[-1] > x
     '''
     # print(f"{list(np.where(x[-1]>x, 1, 0)[:-1])}, {len(np.where(x[-1]>x, 1, 0)[:-1])}")
-    return np.mean(np.where(x[-1]>x, 1, 0)[:-1]) # 당일 날짜 비교는 제외해준다 [:-1]    
+    return np.mean(np.where(x[-1]>x, 1, 0)[:-1]) # 당일 날짜 비교는 제외해준다 [:-1]
 
 c='코스피200'
 target_weights3 = pd.DataFrame()
@@ -138,38 +140,39 @@ target_weights3['base3'] = prices[c].rolling(365).apply(AMS)
 target_weights3['현금'] = 1.0 - target_weights3
 target_weights3.columns = ['base3', '현금']
 
-kbase3 = bt.Strategy('kbase3',
-                    algos = [
-                        bt.algos.RunAfterDate('2002-1-2'),
-                        bt.algos.RunMonthly(),
-                        bt.algos.SelectAll(),
-                        bt.algos.SelectThese(tickers),
-                        StatIDAverageMomentumScore(lag=pd.DateOffset(days=0), cash='현금'),
-                        bt.algos.SelectN(n=3, sort_descending=True),
-                        # bt.algos.PrintDate(),
-                        WeighEquallyWithoutCash(target_weights3, cash='현금'),
-                        # bt.algos.PrintTempData(),
-                        bt.algos.Rebalance()
-                    ],
-                    children=tickers,
-                    # parent = kbase123
-                    )    
+kbase3 = bt.Strategy(
+    'kbase3',
+    [
+        bt.algos.RunAfterDate('2002-1-2'),
+        bt.algos.RunMonthly(),
+        bt.algos.SelectAll(),
+        bt.algos.SelectThese(tickers),
+        StatIDAverageMomentumScore(lag=pd.DateOffset(days=0), cash='현금'),
+        bt.algos.SelectN(n=3, sort_descending=True),
+        # bt.algos.PrintDate(),
+        WeighEquallyWithoutCash(target_weights3, cash='현금'),
+        # bt.algos.PrintTempData(),
+        bt.algos.Rebalance()
+    ],
+    children=tickers,
+)
 
 # --
-kbase123 = bt.Strategy('kbase123', 
-                    algos = [
-                          bt.algos.RunAfterDate('2002-1-2'),
-                          bt.algos.RunMonthly(),
-                          bt.algos.PrintDate(),
-                          bt.algos.SelectAll(),
-                        #   bt.algos.SelectThese(tickers),
-                        # 변동성 제어한 비중에 대한 dataframe
-                          bt.algos.WeighEqually(),
-                          # bt.algos.PrintTempData(),
-                          bt.algos.Rebalance()],
-                    children = [kbase1, kbase2, kbase3]
-                       # children = ['현금']
-                   )
+kbase123 = bt.Strategy(
+    'kbase123',
+    [
+        bt.algos.RunAfterDate('2002-1-2'),
+        bt.algos.RunMonthly(),
+        bt.algos.PrintDate(),
+        bt.algos.SelectAll(),
+    #   bt.algos.SelectThese(tickers),
+    # 변동성 제어한 비중에 대한 dataframe
+        bt.algos.WeighEqually(),
+        # bt.algos.PrintTempData(),
+        bt.algos.Rebalance()
+    ],
+    children = [kbase1, kbase2, kbase3]
+)
 
 # --
 bt_kbase1 = bt.Backtest(kbase1, prices)
@@ -177,6 +180,6 @@ bt_kbase2 = bt.Backtest(kbase2, prices)
 bt_kbase3 = bt.Backtest(kbase3, prices)
 bt_kbase123 = bt.Backtest(kbase123, prices)
 r = bt.run(bt_kbase1, bt_kbase2, bt_kbase3)
-rr = bt.run(bt_kbase1, bt_kbase2, bt_kbase3, bt_kbase123)                                       
+rr = bt.run(bt_kbase1, bt_kbase2, bt_kbase3, bt_kbase123)
 rr.set_date_range("2002-02-01")
 rr.display()

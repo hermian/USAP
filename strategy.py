@@ -15,7 +15,8 @@ class StatIDAverageMomentumScore(bt.Algo):
 
     def __call__(self, target):
         selected = target.temp['selected'].copy()
-        selected.remove(self.cash) # ID Mementum을 구할때 제외하고 구해야 한다.방어코드
+        if self.cash in selected:
+            selected.remove(self.cash) # ID Mementum을 구할때 제외하고 구해야 한다.방어코드
         
         t0 = target.now - self.lag
         # prc = target.universe.loc[(t0 - self.lookback):t0,selected] # FIXME 12개월치의 데이터를 뽑는다.
