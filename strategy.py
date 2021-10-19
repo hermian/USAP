@@ -5,6 +5,47 @@ import bt
 
 # 백테스팅을 위한 전략 클래스 작성
 class StatIDAverageMomentumScore(bt.Algo):
+    def __init__(self, lookback=pd.DateOffset(years=1), #FIXME : 12개월이되어야 하지만 원 알고리즘을 테스트한다.
+                       lag=pd.DateOffset(months=1),
+                       cash='현금'):
+        super(StatIDAverageMomentumScore, self).__init__()
+        self.lookback = lookback
+        self.lag = lag
+        self.cash = cash
+
+    def __call__(self, target):
+        selected = target.temp['selected'].copy()
+        if self.cash in selected:
+            selected.remove(self.cash) # ID Mementum을 구할때 제외하고 구해야 한다.방어코드
+        
+        t0 = target.now - self.lag
+        prc = target.universe.loc[t0-self.lookback:t0,selected]
+
+        m1 = t0 - pd.DateOffset(months=1)
+        m6 = t0 - pd.DateOffset(months=6)
+        m9 = t0 - pd.DateOffset(months=9)
+        m12 = t0 - pd.DateOffset(years=1)
+        
+        m6_returns = (prc.loc[m6:m1,:].calc_total_return()+1) # 1달제외 6개월 수익률 (현재 prices가 공휴일포함 데이터임)
+        m9_returns = (prc.loc[m9:m1,:].calc_total_return()+1) # 1달제외 9개월 수익률
+        m12_returns = (prc.loc[m12:m1,:].calc_total_return()+1)  # 1달제외 12개월 수익률
+        average_returns = (m6_returns+m9_returns+m12_returns)/3
+
+        # ID 계산 최근 30일 제외
+        # dropna에 주의 해야 한다. 조선이 0이 있어 문제가 되므로 모든 column이 nan일 때만 drop한다.
+        m13 = t0 - pd.DateOffset(months=13)
+        len_m1= len(prc.loc[m1:,:])-1
+        #print(f"{t0}, {m1}, {m6}, {m9}, {m12}, {m13}")
+        pos_percent = np.where(prc.loc[m13:,:].pct_change(len_m1).dropna(how='all') > 0.0, 1, 0).mean(axis=0)
+        neg_percent = 1 - pos_percent
+        ID = (neg_percent - pos_percent)
+        # print(f"ID===\n{ID}")
+
+        target.temp['stat'] = average_returns * ID * -1
+        return True
+
+    
+class StatIDAverageMomentumScoreOrig(bt.Algo):
     def __init__(self, lookback=pd.DateOffset(years=2), #FIXME : 12개월이되어야 하지만 원 알고리즘을 테스트한다.
                        lag=pd.DateOffset(months=1),
                        cash='현금'):
