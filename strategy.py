@@ -5,7 +5,7 @@ import bt
 
 # 백테스팅을 위한 전략 클래스 작성
 class StatIDAverageMomentumScore(bt.Algo):
-    def __init__(self, lookback=pd.DateOffset(years=1), #FIXME : 12개월이되어야 하지만 원 알고리즘을 테스트한다.
+    def __init__(self, lookback=pd.DateOffset(months=13), #FIXME : 12개월이되어야 하지만 원 알고리즘을 테스트한다.
                        lag=pd.DateOffset(months=1),
                        cash='현금'):
         super(StatIDAverageMomentumScore, self).__init__()
@@ -16,10 +16,12 @@ class StatIDAverageMomentumScore(bt.Algo):
     def __call__(self, target):
         selected = target.temp['selected'].copy()
         if self.cash in selected:
+#             print('cash:', self.cash)
             selected.remove(self.cash) # ID Mementum을 구할때 제외하고 구해야 한다.방어코드
         
         t0 = target.now - self.lag
-        prc = target.universe.loc[t0-self.lookback:t0,selected]
+        prc = target.universe.loc[t0-(self.lookback+self.lag):t0,selected]
+#         print(prc)
 
         m1 = t0 - pd.DateOffset(months=1)
         m6 = t0 - pd.DateOffset(months=6)
@@ -43,7 +45,6 @@ class StatIDAverageMomentumScore(bt.Algo):
 
         target.temp['stat'] = average_returns * ID * -1
         return True
-
     
 class StatIDAverageMomentumScoreOrig(bt.Algo):
     def __init__(self, lookback=pd.DateOffset(years=2), #FIXME : 12개월이되어야 하지만 원 알고리즘을 테스트한다.
