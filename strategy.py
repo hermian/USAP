@@ -20,7 +20,7 @@ class StatIDAverageMomentumScore(bt.Algo):
             selected.remove(self.cash) # ID Mementum을 구할때 제외하고 구해야 한다.방어코드
         
         t0 = target.now - self.lag
-        prc = target.universe.loc[t0-(self.lookback+self.lag):t0,selected]
+        prc = target.universe.loc[t0-self.lookback:t0,selected]
 #         print(prc)
 
         m1 = t0 - pd.DateOffset(months=1)
