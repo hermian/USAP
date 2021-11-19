@@ -8,22 +8,14 @@ import numpy as np
 import pandas as pd
 from pykrx import stock
 import time
+import bt
+import warnings
 # from tqdm import tqdm
+warnings.filterwarnings(action='ignore')
 
 # pd.options.display.float_format = '{:.4f}'.format
-plt.style.use('ggplot') #ggplot
-plt.rcParams['font.family'] = 'nanummyeongjo'
-plt.rcParams['figure.figsize'] = (12,8)
-plt.rcParams['lines.linewidth'] = 1
-plt.rcParams['axes.grid'] = True
-
-plt.rcParams['axes.formatter.useoffset'] = False
-# plt.rcParmas['axes.formatter.limits'] = -1000, 1000
-
-plt.rcParams['axes.unicode_minus'] = False
 # %matplotlib inline
 from IPython.display import display, HTML
-"%config InlineBackend.figure_format = 'retina'"
 
 #하나의 cell에서 multiple output을 출력을 가능하게 하는 코드
 from IPython.core.interactiveshell import InteractiveShell
@@ -32,8 +24,8 @@ InteractiveShell.ast_node_interactivity = "all"
 pd.set_option('display.float_format', lambda x: '%.3f' % x)
 pd.set_option('max_columns', None)
 # %%
-from strategy import*
-from utils import *
+#from strategy import*
+#from utils import *
 
 # %%
 def 장중이냐(now):
@@ -70,21 +62,23 @@ def get_data(code_list, start, end):
     # 맨마지막 값이 NaN인 컬럼을 삭제한다.
     for c in df.columns:
         if pd.isna(df.iloc[-1][c]):
-            print(c)
+            print(f"drop : {c}")
             df.drop(c, axis=1, inplace=True) 
 
     return df
 
 # %%
-def 종목명(code, df=tickers):
-    """ 사용예) 종목명('A153130') or 종목명('153130')
+def 종목명(code, df):
+    """ 사용예) 종목명('A153130', tickers) or 종목명('153130', tickers)
     """
     if code.startswith('A'):
         return df[df['종목코드'] == code]['종목명'].values[0]
     else:
         return df[df['code'] == code]['종목명'].values[0]
-def 종목코드(name, df=tickers):
+def 종목코드(name, df):
     """ A를 제외한 종목코드를 반환한다. FinanceDataReader에서 사용
+
+    사용예: 종목코드("KODEX달러선물레버리지", tickers)
     """
     _df = df.copy()
     _df['종목명'] = _df['종목명'].str.replace(' ', '')
@@ -121,7 +115,7 @@ def pickup(df, 제외직전개월수=1):
 
     momentum = average_returns * ID * -1
     
-    print(momentum.nlargest(3))
+    print(f"pickup : ======================\n{momentum.nlargest(3)}\n=================================")
 
     return list(momentum.nlargest(3).index)
 
@@ -284,10 +278,14 @@ if __name__ == '__main__':
     해외채권비중 = 나스닥해외채권비중 + 다우해외채권비중
 
     ############ 비중 출력
+    print("\n\n\n")
     print("="*80)
     print(f"비중 계산 기준 일자 : {baseday_str}")
+    print("="*80)
     print(f"섹터 비중: {섹터비중}")
     print(f"채권비중({cash}):{채권비중}")
     print(f"나스닥비중(133690): {나스닥비중}") # A133690,TIGER 미국나스닥100
     print(f"다우비중(245340): {다우비중}") #A245340,TIGER 미국다우존스30
     print(f"해외채권비중({dollar}): {해외채권비중}")
+    print("="*80)
+    print("\n\n\n")
