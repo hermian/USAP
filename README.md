@@ -28,3 +28,5 @@ security_weights.plot.area(stacked=True, alpha=0.7, legend=False, cmap='jet', fi
   - ID2_외국인수급_데이터수정.ipynb
   - index.go.kr데이터는 외국인 보유 주식수에 현재 주가데이터를 반영한 것이라 백테스트에 맞지 않음
   - 대신증권 HTS에서 투자자별매매동향(거래대금, 순매수) 데이터를 다운로드 후 cumsum한 것으로 테스트 변경
+- ID2 외국인수급+개인수급역추종 비중
+  - ID2_외국인개인수급.ipynb
