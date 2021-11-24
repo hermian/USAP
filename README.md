@@ -30,5 +30,6 @@ security_weights.plot.area(stacked=True, alpha=0.7, legend=False, cmap='jet', fi
   - 대신증권 HTS에서 투자자별매매동향(거래대금, 순매수) 데이터를 다운로드 후 cumsum한 것으로 테스트 변경
 - ID2 외국인수급+개인수급역추종 비중
   - ID2_외국인개인수급.ipynb
-    대통합외국인개인수급.ipynb
-  - 대통합외국인수급수정.ipynb !!!
+  - 대통합외국인개인수급.ipynb
+  
+- 대통합외국인수급수정.ipynb !!!
