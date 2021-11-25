@@ -20,6 +20,10 @@ security_weights.plot.area(stacked=True, alpha=0.7, legend=False, cmap='jet', fi
 
 ## ChangeLog
 
+### 2021/11/25
+
+- 미국달러자산_현금추가.ipynb <- 기존대비 더 좋지 않다. MDD(Avg Drawdown) 나 CAGR이나
+
 ### 202111-21
 
 - 미국달러레버리지자산.ipynb, 대통합달러레버.ipynb 추가
@@ -31,5 +35,5 @@ security_weights.plot.area(stacked=True, alpha=0.7, legend=False, cmap='jet', fi
 - ID2 외국인수급+개인수급역추종 비중
   - ID2_외국인개인수급.ipynb
   - 대통합외국인개인수급.ipynb
-  
+
 - 대통합외국인수급수정.ipynb !!!

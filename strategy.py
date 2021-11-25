@@ -18,7 +18,7 @@ class StatIDAverageMomentumScore(bt.Algo):
         if self.cash in selected:
 #             print('cash:', self.cash)
             selected.remove(self.cash) # ID Mementum을 구할때 제외하고 구해야 한다.방어코드
-        
+
         t0 = target.now - self.lag
         prc = target.universe.loc[t0-self.lookback:t0,selected]
 #         print(prc)
@@ -27,7 +27,7 @@ class StatIDAverageMomentumScore(bt.Algo):
         m6 = t0 - pd.DateOffset(months=6)
         m9 = t0 - pd.DateOffset(months=9)
         m12 = t0 - pd.DateOffset(years=1)
-        
+
         m6_returns = (prc.loc[m6:m1,:].calc_total_return()+1) # 1달제외 6개월 수익률 (현재 prices가 공휴일포함 데이터임)
         m9_returns = (prc.loc[m9:m1,:].calc_total_return()+1) # 1달제외 9개월 수익률
         m12_returns = (prc.loc[m12:m1,:].calc_total_return()+1)  # 1달제외 12개월 수익률
@@ -45,7 +45,7 @@ class StatIDAverageMomentumScore(bt.Algo):
 
         target.temp['stat'] = average_returns * ID * -1
         return True
-    
+
 class StatIDAverageMomentumScoreOrig(bt.Algo):
     def __init__(self, lookback=pd.DateOffset(years=2), #FIXME : 12개월이되어야 하지만 원 알고리즘을 테스트한다.
                        lag=pd.DateOffset(months=1),
@@ -119,3 +119,10 @@ class WeighEquallyWithoutCash(bt.Algo):
 
         return True
 
+def long_only_ew(data, name, start_date):
+    s = bt.Strategy(name, [bt.algos.RunAfterDate(start_date), # '2002-02-01'
+                           bt.algos.RunOnce(),
+                           bt.algos.SelectAll(),
+                           bt.algos.WeighEqually(),
+                           bt.algos.Rebalance()])
+    return bt.Backtest(s, data, initial_capital=100000000.0)
