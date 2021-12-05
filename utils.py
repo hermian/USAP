@@ -23,7 +23,46 @@ def plot_df(df, figsize=(12,9), title="", legend_loc="best", legend_ordered=True
         for line, text in zip(leg.get_lines(), leg.get_texts()):
             text.set_color(line.get_color()) # 범례의 글씨 색깔을 범례와 동일하게
 
-def 투자시점별CAGRMDD(backtest):
+def plot_assets(backtest_result, start, end, strategy_name, **kwargs):
+    res1 = backtest_result
+    start = start
+    end = end
+    plt.rcParams["figure.figsize"] = [16, 12]
+    plt.subplots_adjust(hspace=0)
+
+    color_dict = kwargs.pop('color_dict', None)
+
+    # 첫번째 칸에 그림을 그린다.
+    ax1 = plt.subplot2grid((3,1), (0,0), rowspan=2)
+    # 두개를 한 칸에 그리기 위해 ax=ax1으로 axis공유
+    if color_dict:
+        color = [color_dict.get(x, "#333333") for x in res1.prices.columns]
+        ax2 = res1.prices[start:end].plot(ax=ax1, lw=1, color=color, logy=True, **kwargs) # 모든 데이터 r_all
+    else:
+        ax2 = res1.prices[start:end].plot(ax=ax1, lw=1, logy=True, **kwargs) # 모든 데이터 r_all
+    for line in ax2.get_lines():
+        if line.get_label() in strategy_name:
+            line.set_linewidth(3)
+    plt.legend(loc="upper left");
+    plt.title(strategy_name, fontsize=20)
+    if color_dict:
+        color = [color_dict.get(x, "#333333") for x in res1.get_security_weights(strategy_name).columns]
+        res1.get_security_weights(strategy_name)[start:end].plot.area(alpha=0.1, ax=ax1, color=color, secondary_y=True, **kwargs)
+    else:
+        res1.get_security_weights(strategy_name)[start:end].plot.area(alpha=0.1, ax=ax1, secondary_y=True, **kwargs)
+
+
+    # 두번째 칸에 그림을 그린다.
+    # drawdown을 그림다. 두개를 하나에 그리기 위해 ax=ax2로 axis를 공유
+    ax2 = plt.subplot2grid((3,1), (2,0))
+    if color_dict:
+        color = [color_dict.get(x, "#333333") for x in res1.prices.columns]
+        res1.prices[start:end].to_drawdown_series().plot.area(stacked=False, color=color, legend=True, ax=ax2, **kwargs)
+    else:
+        res1.prices[start:end].to_drawdown_series().plot.area(stacked=False,legend=True, ax=ax2, **kwargs)
+    res1.prices.loc[start:end,strategy_name].to_drawdown_series().plot(legend=False, color='black', alpha=1, lw=1, ls='-', ax=ax2)
+
+def 투자진입시점별CAGRMDD(backtest):
     """
 
     Args:
@@ -49,6 +88,7 @@ def 투자시점별CAGRMDD(backtest):
     tdf.columns = ['cagr', 'mdd']
 
     end = r.prices.index[-1] - pd.DateOffset(years=1)
+    print(end)
 
     ####### plot
     # tdf[:end].plot(figsize=(12,6)) # area의 경우 cagr negative문제 있음
