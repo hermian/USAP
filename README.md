@@ -22,7 +22,7 @@ security_weights.plot.area(stacked=True, alpha=0.7, legend=False, cmap='jet', fi
 
 ### 2021/12/5
 
-- 대통합_LAA.ipynb (#1) 추가
+- 대통합_LAA.ipynb ([#1]) 추가
 
 ### 2021/11/25
 
