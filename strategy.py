@@ -50,7 +50,7 @@ class StatIDAverageMomentumScoreOrig(bt.Algo):
     def __init__(self, lookback=pd.DateOffset(years=2), #FIXME : 12개월이되어야 하지만 원 알고리즘을 테스트한다.
                        lag=pd.DateOffset(months=1),
                        cash='현금'):
-        super(StatIDAverageMomentumScore, self).__init__()
+        super(StatIDAverageMomentumScoreOrig, self).__init__()
         self.lookback = lookback
         self.lag = lag
         self.cash = cash
@@ -107,6 +107,7 @@ class WeighEquallyWithoutCash(bt.Algo):
             # ID Mementum을 구할때 제외하고 구해야 한다. (방어코드)
 
         t0 = target.now - self.lag
+
         cash_weight = self.cash_weights.loc[t0, self.cash]
         others_weights= 1.0 - cash_weight # selected의 비중
 
