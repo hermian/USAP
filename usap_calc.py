@@ -63,7 +63,7 @@ def get_data(code_list, start, end):
     for c in df.columns:
         if pd.isna(df.iloc[-1][c]):
             print(f"drop : {c}")
-            df.drop(c, axis=1, inplace=True) 
+            df.drop(c, axis=1, inplace=True)
 
     return df
 
@@ -82,16 +82,16 @@ def 종목코드(name, df):
     """
     _df = df.copy()
     _df['종목명'] = _df['종목명'].str.replace(' ', '')
-    return _df[_df['종목명'] == name.replace(' ', '')]['code'].values[0]        
+    return _df[_df['종목명'] == name.replace(' ', '')]['code'].values[0]
 
 # %%
 def pickup(df, 제외직전개월수=1):
-    """df에서 모멘텀이 가장 좋은 3종목을 선택한다.   
+    """df에서 모멘텀이 가장 좋은 3종목을 선택한다.
 
     Args :
         - df : 가격 데이터프레임
         - 제외직전개월수 : df에서 제외할 데이터 개월 수
-        - now : 가격 데이터프레임의 가장 아래 시간 
+        - now : 가격 데이터프레임의 가장 아래 시간
     """
     t0 = df.index[-1]
     제외 = t0 - pd.DateOffset(months=제외직전개월수)
@@ -114,7 +114,7 @@ def pickup(df, 제외직전개월수=1):
     ID = (neg_percent - pos_percent)
 
     momentum = average_returns * ID * -1
-    
+
     print(f"pickup : ======================\n{momentum.nlargest(3)}\n=================================")
 
     return list(momentum.nlargest(3).index)
@@ -144,14 +144,14 @@ def calcOECD시그널비중():
     return target_weight
 
 # 예제
-# OECD시그널비중()    
+# OECD시그널비중()
 # %% [markdown]
 # 저녁에 돌리면 다음날 리밸런싱할것이고
 # 9시전에 돌리면 오늘 리밸런싱할 비중(어제종가 기준)을 구할려고 하고
 # 장중에 돌리면 오늘 리밸런싱할 비중(어제종가 기준)을 구할려고 한다.
 # %%
-# 외국인 수급 읽어 와야 
-# 개인 수급도 읽어 와야 
+# 외국인 수급 읽어 와야
+# 개인 수급도 읽어 와야
 def calc외국인수급비중(df):
     baseday = df.index[-1]
     before_one_year = baseday - pd.DateOffset(years=1)
@@ -164,11 +164,11 @@ def calc외국인수급비중(df):
     외국인수급1m = 외국인수급[baseday-pd.DateOffset(months=1):baseday]
     외국인수급2m = 외국인수급[baseday-pd.DateOffset(months=2):baseday-pd.DateOffset(months=1)]
     외국인수급3m = 외국인수급[baseday-pd.DateOffset(months=3):baseday-pd.DateOffset(months=2)]
-    
+
     외국인수급1m증가 = 외국인수급1m.iloc[-1] > 외국인수급1m.iloc[0]
     외국인수급2m증가 = 외국인수급2m.iloc[-1] > 외국인수급2m.iloc[0]
     외국인수급3m증가 = 외국인수급3m.iloc[-1] > 외국인수급3m.iloc[0]
-    
+
     print("외국인수급: ", 외국인수급1m증가, 외국인수급2m증가, 외국인수급3m증가)
     연속3개월 = ((외국인수급3m증가) & (외국인수급2m증가) & (외국인수급1m증가))
     연속2개월 = ((외국인수급2m증가) & (외국인수급1m증가))
@@ -253,9 +253,9 @@ if __name__ == '__main__':
     모멘텀채권비중 = 모멘텀스코어매매총비중 * (1-코스피모멘텀스코어비중)
 
     섹터비중 = {}
-    섹터비중[탑픽종목코드[0]] = OECD섹터비중 + 수급섹터비중/2 + 모멘텀섹터비중/3
-    섹터비중[탑픽종목코드[1]] = 수급섹터비중/2 + 모멘텀섹터비중/3
-    섹터비중[탑픽종목코드[2]] = 모멘텀섹터비중/3
+    섹터비중[탑픽종목코드[0]] = round((OECD섹터비중 + 수급섹터비중/2 + 모멘텀섹터비중/3)*100, 2)
+    섹터비중[탑픽종목코드[1]] = round((수급섹터비중/2 + 모멘텀섹터비중/3)*100, 2)
+    섹터비중[탑픽종목코드[2]] = round((모멘텀섹터비중/3)*100, 2)
 
     채권비중 = OECD채권비중+수급채권비중+모멘텀채권비중
 
@@ -267,14 +267,14 @@ if __name__ == '__main__':
     다우모멘텀스코어비중 = 다우['Adj Close'].rolling(len(다우)).apply(AMS).iloc[-1]
 
     해외비중 = 0.5
-    나스닥매매총비중 = 해외비중 * 0.5 
+    나스닥매매총비중 = 해외비중 * 0.5
     나스닥비중 = 나스닥매매총비중 * 나스닥모멘텀스코어비중
     나스닥해외채권비중 = 나스닥매매총비중 * (1-나스닥모멘텀스코어비중)
 
-    다우매매총비중 = 해외비중 * 0.5 
+    다우매매총비중 = 해외비중 * 0.5
     다우비중 = 다우매매총비중 * 다우모멘텀스코어비중
     다우해외채권비중 = 다우매매총비중 * (1-다우모멘텀스코어비중)
-    
+
     해외채권비중 = 나스닥해외채권비중 + 다우해외채권비중
 
     ############ 비중 출력
@@ -283,9 +283,9 @@ if __name__ == '__main__':
     print(f"비중 계산 기준 일자 : {baseday_str}")
     print("="*80)
     print(f"섹터 비중: {섹터비중}")
-    print(f"채권비중({cash}):{채권비중}")
-    print(f"나스닥비중(133690): {나스닥비중}") # A133690,TIGER 미국나스닥100
-    print(f"다우비중(245340): {다우비중}") #A245340,TIGER 미국다우존스30
-    print(f"해외채권비중({dollar}): {해외채권비중}")
+    print(f"채권비중({cash}):{채권비중*100:.2f}")
+    print(f"나스닥비중(133690): {나스닥비중*100:.2f}") # A133690,TIGER 미국나스닥100
+    print(f"다우비중(245340): {다우비중*100:.2f}") #A245340,TIGER 미국다우존스30
+    print(f"해외채권비중({dollar}): {해외채권비중*100:.2f}")
     print("="*80)
     print("\n\n\n")
