@@ -20,6 +20,11 @@ security_weights.plot.area(stacked=True, alpha=0.7, legend=False, cmap='jet', fi
 
 ## ChangeLog
 
+### 2021/12/8
+
+- 대통합_LAA_Without_IEF.ipynb (https://github.com/hermian/USAP/issues/2) 추가
+- 대통합_LAA.ipynb 갱신 (gold_H 를 새로 만들어서 재 테스트 기존 보다 약간 안좋은 듯?)
+
 ### 2021/12/5
 
 - 대통합_LAA.ipynb (https://github.com/hermian/USAP/issues/1) 추가
